@@ -54,9 +54,15 @@ app.get('/menu', async (req, res) => {
     res.send(cursor);
 })
 
+app.get('/cart', async (req, res) => {
+    const cart = cartCollection.find();
+    const result = await cart.toArray();
+    res.send(result);
+})
+
 app.post('/cart', async (req, res) => {
     const cart = req.body;
-    const result = cartCollection.insertOne(cart);
+    const result = await cartCollection.insertOne(cart);
     res.send(result);
 })
 

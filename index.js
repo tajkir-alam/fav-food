@@ -66,29 +66,40 @@ app.post('/cart', async (req, res) => {
     res.send(result);
 })
 
-app.patch('/cart/increase-quantity/:id', async (req, res) => {
+app.patch('/cart/decrease-quantity/:id', async (req, res) => {
     const id = req.params.id;
     const filter = { _id: new ObjectId(id) };
-    const updateQuantity = {
-        $inc: {
-            quantity: 1
+    const updateQuantity =  [
+        {
+          $set: {
+            quantity: { $subtract: ["$quantity", 1] },
+            price: {
+              $multiply: [{ $subtract: ["$price", 0] }]
+            }
+          }
         }
-    }
+      ];
     const result = await cartCollection.updateOne(filter, updateQuantity);
     res.send(result);
 })
 
-app.patch('/cart/decrease-quantity/:id', async (req, res) => {
+app.patch('/cart/increase-quantity/:id', async (req, res) => {
     const id = req.params.id;
     const filter = { _id: new ObjectId(id) };
-    const updateQuantity = {
-        $inc: {
-            quantity: -1
+    const updateQuantity = [
+        {
+            $set: {
+                quantity: { $add: ["$quantity", 1] },
+                price: {
+                    $add: [{ $toDouble: "$price" }]
+                }
+            }
         }
-    }
+    ];
     const result = await cartCollection.updateOne(filter, updateQuantity);
     res.send(result);
 })
+
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

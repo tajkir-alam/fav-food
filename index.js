@@ -1,7 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -66,6 +66,29 @@ app.post('/cart', async (req, res) => {
     res.send(result);
 })
 
+app.patch('/cart/increase-quantity/:id', async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) };
+    const updateQuantity = {
+        $inc: {
+            quantity: 1
+        }
+    }
+    const result = await cartCollection.updateOne(filter, updateQuantity);
+    res.send(result);
+})
+
+app.patch('/cart/decrease-quantity/:id', async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: new ObjectId(id) };
+    const updateQuantity = {
+        $inc: {
+            quantity: -1
+        }
+    }
+    const result = await cartCollection.updateOne(filter, updateQuantity);
+    res.send(result);
+})
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

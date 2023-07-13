@@ -39,6 +39,7 @@ dbConnect()
 
 const usersCollection = client.db("FavFood").collection("users");
 const menuCollection = client.db("FavFood").collection("menu");
+const cartCollection = client.db("FavFood").collection("cart");
 
 
 app.get('/users', async (req, res) => {
@@ -51,6 +52,12 @@ app.get('/menu', async (req, res) => {
     const menu = menuCollection.find();
     const cursor = await menu.toArray();
     res.send(cursor);
+})
+
+app.post('/cart', async (req, res) => {
+    const cart = req.body;
+    const result = cartCollection.insertOne(cart);
+    res.send(result);
 })
 
 

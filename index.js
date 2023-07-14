@@ -40,6 +40,7 @@ dbConnect()
 const usersCollection = client.db("FavFood").collection("users");
 const menuCollection = client.db("FavFood").collection("menu");
 const cartCollection = client.db("FavFood").collection("cart");
+const orderCollection = client.db("FavFood").collection("order");
 
 
 app.get('/users', async (req, res) => {
@@ -66,19 +67,26 @@ app.post('/cart', async (req, res) => {
     res.send(result);
 })
 
+app.delete('/cart/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await cartCollection.deleteOne(query);
+    res.send(result)
+})
+
 app.patch('/cart/decrease-quantity/:id', async (req, res) => {
     const id = req.params.id;
     const filter = { _id: new ObjectId(id) };
-    const updateQuantity =  [
+    const updateQuantity = [
         {
-          $set: {
-            quantity: { $subtract: ["$quantity", 1] },
-            price: {
-              $multiply: [{ $subtract: ["$price", 0] }]
+            $set: {
+                quantity: { $subtract: ["$quantity", 1] },
+                price: {
+                    $multiply: [{ $subtract: ["$price", 0] }]
+                }
             }
-          }
         }
-      ];
+    ];
     const result = await cartCollection.updateOne(filter, updateQuantity);
     res.send(result);
 })
@@ -91,7 +99,7 @@ app.patch('/cart/increase-quantity/:id', async (req, res) => {
             $set: {
                 quantity: { $add: ["$quantity", 1] },
                 price: {
-                    $add: [{ $toDouble: "$price" }]
+                    $add: [{ $toDouble: "$price" }, 0]
                 }
             }
         }
@@ -99,6 +107,8 @@ app.patch('/cart/increase-quantity/:id', async (req, res) => {
     const result = await cartCollection.updateOne(filter, updateQuantity);
     res.send(result);
 })
+
+
 
 
 app.listen(port, () => {

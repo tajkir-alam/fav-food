@@ -109,7 +109,17 @@ app.patch('/cart/increase-quantity/:id', async (req, res) => {
 })
 
 
+app.get('/order', async (req, res) => {
+    const order = orderCollection.find();
+    const result = await order.toArray();
+    res.send(result);
+})
 
+app.post('/order', async (req, res) => {
+    const order = req.body;
+    const result = await orderCollection.insertOne(order);
+    res.send(result);
+})
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
